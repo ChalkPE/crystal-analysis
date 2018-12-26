@@ -8,12 +8,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "node --no-warnings ."
+    "start": "node ."
   },
   "dependencies": {
+    "console-png": "^1.2.1",
     "inquirer": "^6.2.1",
-    "opn": "^5.4.0",
-    "puppeteer": "^1.11.0"
+    "puppeteer": "^1.11.0",
+    "sharp": "^0.21.1"
   },
   "devDependencies": {
     "standard": "^12.0.1"
