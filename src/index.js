@@ -6,7 +6,8 @@ const puppeteer = require('puppeteer')
 const print = util.promisify(require('console-png'))
 
 const ENTRY_URL = 'https://www.ff14.co.kr/main'
-const LIST_URL = 'https://www.ff14.co.kr/shop/MyShop/MyListAction'
+const LIST_URL = 'https://www.ff14.co.kr/shop/myShop/MyList?Type=C'
+const LIST_ACTION_URL = 'https://www.ff14.co.kr/shop/MyShop/MyListAction'
 
 const NICKNAME_DIV = '.nickname'
 const LOGIN_BUTTON = '.login_ok'
@@ -24,7 +25,7 @@ const TYPES = {
   G: '선물 발송'
 }
 
-function req ({ type, year, month, url }) {
+async function req ({ type, year, month, url }) {
   const body = new FormData()
   body.append('Type', type)
   body.append('StartYear', year)
@@ -70,6 +71,7 @@ async function main() {
 
   const nickname = await page.$eval(NICKNAME_DIV, n => n.textContent)
   console.log(`${nickname}님의 데이터를 찾는 중...`)
+  await page.goto(LIST_URL)
 
   const list = []
   const now = new Date().getFullYear()
@@ -78,7 +80,7 @@ async function main() {
     console.log(`${typeName} 내역 가져오는 중...`)
     for (let year = now - 4; year <= now; year++) {
       for (let month = 1; month <= 12; month++) {
-        const p = { type, year, month, url: LIST_URL }
+        const p = { type, year, month, url: LIST_ACTION_URL }
         list.push({ type, year, month, res: await page.evaluate(req, p) })
       }
     }
