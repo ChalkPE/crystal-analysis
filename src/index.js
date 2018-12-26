@@ -1,5 +1,6 @@
 const fs = require('fs')
 const util = require('util')
+const opn = require('opn')
 const sharp = require('sharp')
 const inquirer = require('inquirer')
 const puppeteer = require('puppeteer')
@@ -74,21 +75,44 @@ async function main() {
   await page.goto(LIST_URL)
 
   const list = []
-  const now = new Date().getFullYear()
+  const Y = new Date().getFullYear()
+  const M = 1 + new Date().getMonth()
 
-  for (let [type, typeName] of Object.entries(TYPES)) {
-    console.log(`${typeName} 내역 가져오는 중...`)
-    for (let year = now - 4; year <= now; year++) {
-      for (let month = 1; month <= 12; month++) {
+  console.log('이용권 구매 내역을 가져오는 중...')
+  const bParams = { type: 'B', year: Y, month: M, url: LIST_ACTION_URL }
+  const bResult = (await page.evaluate(req, bParams)).ShopList.reverse()
+  bResult.forEach(item => {
+    const [year, month] = item.buydate.split('.').map(v => parseInt(v, 10))
+    const m = list.find(l => l.type === 'B' && l.year === year && l.month === month)
+    if (m) m.data.push(item)
+    return list
+  })
+
+  const firstYear = +bResult[0].buydate.split('.')[0]
+  for (let year = firstYear; year <= Y; year++) {
+    console.log(`${year}년 데이터를 가져오는 중...`)
+
+    for (let month = 1; month <= (year === Y ? M : 12); month++) {
+      for (let type of Object.keys(TYPES)) {
+        if (type === 'B') {
+          list.push({ type, year, month, data: [] })
+          continue
+        }
+
         const p = { type, year, month, url: LIST_ACTION_URL }
-        list.push({ type, year, month, res: await page.evaluate(req, p) })
+        list.push({ type, year, month, data: (await page.evaluate(req, p)).ShopList })
       }
+
     }
   }
 
+
+
   console.log('결과 저장하는 중...')
   fs.writeFileSync('result.json', JSON.stringify(list, null, 2))
+  
   await browser.close()
+  await opn('index.html')
 }
 
 main()
