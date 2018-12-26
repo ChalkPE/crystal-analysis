@@ -1,0 +1,21 @@
+{
+  "name": "crystal-analysis",
+  "version": "1.0.0",
+  "description": "FF14KR purchase history analyser",
+  "main": "src/index.js",
+  "repository": "https://github.com/ChalkPE/crystal-analysis",
+  "author": "Chalk <chalkpe@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "node --no-warnings ."
+  },
+  "dependencies": {
+    "inquirer": "^6.2.1",
+    "opn": "^5.4.0",
+    "puppeteer": "^1.11.0"
+  },
+  "devDependencies": {
+    "standard": "^12.0.1"
+  }
+}
