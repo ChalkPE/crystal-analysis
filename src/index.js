@@ -81,12 +81,6 @@ async function main() {
   console.log('이용권 구매 내역을 가져오는 중...')
   const bParams = { type: 'B', year: Y, month: M, url: LIST_ACTION_URL }
   const bResult = (await page.evaluate(req, bParams)).ShopList.reverse()
-  bResult.forEach(item => {
-    const [year, month] = item.buydate.split('.').map(v => parseInt(v, 10))
-    const m = list.find(l => l.type === 'B' && l.year === year && l.month === month)
-    if (m) m.data.push(item)
-    return list
-  })
 
   const firstYear = +bResult[0].buydate.split('.')[0]
   for (let year = firstYear; year <= Y; year++) {
@@ -102,11 +96,15 @@ async function main() {
         const p = { type, year, month, url: LIST_ACTION_URL }
         list.push({ type, year, month, data: (await page.evaluate(req, p)).ShopList })
       }
-
     }
   }
 
-
+  bResult.forEach(item => {
+    const [year, month] = item.buydate.split('.').map(v => parseInt(v, 10))
+    const m = list.find(l => l.type === 'B' && l.year === year && l.month === month)
+    if (m) m.data.push(item)
+    return list
+  })
 
   console.log('결과 저장하는 중...')
   fs.writeFileSync('result.json', JSON.stringify(list, null, 2))

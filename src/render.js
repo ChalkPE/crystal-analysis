@@ -19,13 +19,11 @@ function findLastIndex (arr, predicate) {
 }
 
 function trim (opts) {
-  const first = Math.min(...opts.series.map(s => s.data.findIndex(d => d > 0)))
-  const last = Math.max(...opts.series.map(s => findLastIndex(s.data, d => d > 0)))
+  const first = Math.min(...opts.series.map(s => s.data.findIndex(d => d > 0)).filter(v => v > -1))
+  const last = Math.max(...opts.series.map(s => findLastIndex(s.data, d => d > 0)).filter(v => v > -1))
 
   const start = Math.max(0, first - 1)
   const end = Math.min(opts.xaxis.categories.length, last + 2)
-
-  console.log(first, last, start, end)
 
   return {
     ...opts,
